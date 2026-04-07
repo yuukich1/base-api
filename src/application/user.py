@@ -35,5 +35,4 @@ class UserService:
         hashed_password = self.security.hash_password(data.new_password)
         await self.uow.users.update(user_id, {'hashed_password': hashed_password})
         await self.uow.commit()
-        return {'status': 'OK'}
         
