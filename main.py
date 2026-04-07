@@ -28,7 +28,7 @@ async def domain_error_handler(request: Request, exc: DomainError):
         }
     )
 
-@app.get("", include_in_schema=False)
+@app.get("/", include_in_schema=False)
 async def scalar_html():
     return get_scalar_api_reference(
         openapi_url=app.openapi_url,
