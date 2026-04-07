@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, Optional, TypeVar
+import uuid
 from pydantic import EmailStr
 from sqlmodel import SQLModel
 
@@ -39,8 +40,12 @@ class AbstractUserRepository(AbstractRepository[T]):
     async def get_by_refresh_token(self, refresh_tokem: str) -> Optional[T]: ...
 
 class AbstractRefreshTokenRepository(AbstractRepository[T]):
+    
     @abstractmethod
     async def delete_by_refresh_token(self, refresh_token: str): ...
 
     @abstractmethod
     async def update_refresh_token(self, old_refresh: str, new_refresh: str, expire: int): ...
+
+    @abstractmethod
+    async def delete_by_user_id(self, user_id: uuid.UUID): ...

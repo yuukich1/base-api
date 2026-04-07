@@ -24,6 +24,10 @@ class InvalidTokenError(DomainError):
     status_code = 401
     message = "Токен недействителен или просрочен"
 
-class InvalidCredentialErorr(DomainError):
+class InvalidCredentialError(DomainError):
     status_code = 400
     message = "Не верный логин или пароль"
+
+class ForbidenError(DomainError):
+    status_code = 403
+    message = 'Недостаточно прав'

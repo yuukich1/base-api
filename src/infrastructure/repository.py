@@ -82,3 +82,4 @@ class RefreshTokenRepository(SQLRepository[RefreshTokenTable]):
     async def update_refresh_token(self, old_refresh: str, new_refresh: str, expire: int):
         stmt = update(RefreshTokenTable).values(token=new_refresh, expire=expire).filter_by(token=old_refresh)
         await self.session.execute(stmt)
+
