@@ -6,9 +6,11 @@ from src.domain.enum import UserAccessLevel
 from src.infrastructure.connect import async_session_maker
 from src.infrastructure.unit_of_work import UnitOfWork
 from src.domain.interfaces.unit_of_work import AbstractUnitOfWork
-from src.infrastructure.security import FullSecurityService
+from src.infrastructure.security import FullSecurityService, JWTUserSchema
 from src.domain.exceptions import ForbidenError
 from src.config import settings, oauth2_scheme
+
+
 
 async def get_uow() -> AsyncGenerator[AbstractUnitOfWork, None]:
     async with UnitOfWork(async_session_maker) as uow:
@@ -34,24 +36,25 @@ def get_auth_service(
 def get_current_user(
     security: SecurityDep,
     token: str = Security(oauth2_scheme)
-) -> dict:
+) -> JWTUserSchema:
     return security.get_current_user(token)
 
 
 def check_access(requred_level: UserAccessLevel):
-    def _check(user_data: dict = Security(get_current_user)):
-        if user_data.get('access_level') != requred_level:
+    def _check(user_data: JWTUserSchema = Security(get_current_user)):
+        if user_data.access_level != requred_level:
             raise ForbidenError
         return user_data
     return _check
 
-def get_user_service(uow: UOWDep):
-    return UserService(uow=uow)
+def get_user_service(security: SecurityDep,uow: UOWDep):
+    return UserService(uow=uow, security=security)
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
-CurrentUserDep = Annotated[dict, Depends(get_current_user)]
-AdminAccessDep = Annotated[dict, Depends(check_access(UserAccessLevel.ADMIN))]
-EmployeeAccessDep = Annotated[dict, Depends(check_access(UserAccessLevel.EMPLOYEE))]
-UserAccessDep = Annotated[dict, Depends(check_access(UserAccessLevel.USER))]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
+CurrentUserDep = Annotated[JWTUserSchema, Depends(get_current_user)] 
+
+AdminAccessDep = Annotated[JWTUserSchema, Depends(check_access(UserAccessLevel.ADMIN))]
+EmployeeAccessDep = Annotated[JWTUserSchema, Depends(check_access(UserAccessLevel.EMPLOYEE))]
+UserAccessDep = Annotated[JWTUserSchema, Depends(check_access(UserAccessLevel.USER))]

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Response, Request
-from src.application.dto.auth import UserRegisterResponse, UserRegisterRequest, UserLoginResponse, UserLoginRequest
+from fastapi import APIRouter, Response, Request, Form
+from typing import Annotated
+from src.application.dto.auth import AccessTokenResponse, UserRegisterResponse, UserRegisterRequest, UserLoginResponse, UserLoginRequest
 from src.api.dependencies import AuthServiceDep, CurrentUserDep
 from src.config import settings
 from src.domain.exceptions import InvalidTokenError
@@ -12,9 +13,9 @@ async def register(response: Response, data: UserRegisterRequest, auth_service: 
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=not settings.DEBUG, samesite="lax")
     return res_dto
 
-@router.post('/login', status_code=200, response_model=UserLoginResponse)
-async def login(response: Response, data: UserLoginRequest, auth_service: AuthServiceDep) -> UserLoginResponse:
-    access_token, refresh_token = await auth_service.login(data)
+@router.post('/login', status_code=200, response_model=AccessTokenResponse)
+async def login(response: Response, username: Annotated[str, Form(...)], password: Annotated[str, Form(...)], auth_service: AuthServiceDep) -> AccessTokenResponse:
+    access_token, refresh_token = await auth_service.login(UserLoginRequest(username=username, password=password))
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=not settings.DEBUG, samesite="lax")
     return access_token
 

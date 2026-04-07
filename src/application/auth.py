@@ -4,7 +4,6 @@ from src.domain.exceptions import UserAlreadyExists, InvalidCredentialError, Inv
 from src.domain.interfaces import AbstractSecurityService, AbstractUnitOfWork
 from src.domain.models import UserDomain
 from src.application.dto.auth import UserLoginRequest, UserRegisterRequest, UserRegisterResponse, UserLoginResponse, AccessTokenResponse
-from src.domain.enum import UserAccessLevel
 from src.config import settings
 from loguru import logger
 class AuthService:
@@ -28,7 +27,7 @@ class AuthService:
         ), refresh_token
 
     async def login(self, data: UserLoginRequest):
-        user = await self.uow.users.get_by_email(data.email)
+        user = await self.uow.users.get_by_username(data.username)
         if not user or not self.security.verify_password(data.password, user.hashed_password):
             raise InvalidCredentialError
         access_token, refresh_token = self.__create_pair_token(user)
@@ -38,10 +37,7 @@ class AuthService:
             'expire': settings.REFRESH_EXPIRE
         })
         await self.uow.commit()
-        return UserLoginResponse(
-            status='OK',
-            auth=AccessTokenResponse(access_token=access_token, expire=settings.ACCESS_EXPIRE)
-        ), refresh_token
+        return AccessTokenResponse(access_token=access_token, expire=settings.ACCESS_EXPIRE), refresh_token
 
     def __create_payload(self, data: UserDomain):
         return {

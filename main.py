@@ -4,20 +4,17 @@ from scalar_fastapi import get_scalar_api_reference
 from src.domain.exceptions import DomainError
 from src.api.v1 import auth_router, me_router
 
-app = FastAPI(title="Marketplace API",
+app = FastAPI(
+    title="Core Service API",
     description="""
-    ## REST API для управления маркетплейсом.
-
-    ### Основной функционал:
-    * **Auth**: Авторизация через OAuth2 (JWT Bearer)
-    * **Products**: Управление каталогом товаров и категориями
-    * **UOW**: Асинхронное управление транзакциями
+    ## Prototype API
+    
+    Абстрактный бэкенд-сервис. Находится в разработке.
 
     ---
     *Developer: Yuuki*
     """,
     version="0.1.0",
-    openapi_url="/api/v1/openapi.json",
     docs_url=None)
 
 @app.exception_handler(DomainError)

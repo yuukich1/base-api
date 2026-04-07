@@ -1,14 +1,22 @@
 # src/infrastructure/security.py
 import time
 from typing import Any, Dict
+import uuid
 from authlib.jose import JsonWebToken
 from authlib.jose.errors import JoseError
 from fastapi import Depends
 from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
 from src.domain.enum import UserAccessLevel
 from src.domain.interfaces.security import AbstractSecurityService
 from src.domain.exceptions import InvalidTokenError, ForbidenError
 from src.config import oauth2_scheme
+
+
+class JWTUserSchema(BaseModel):
+    id: uuid.UUID
+    email: EmailStr
+    access_level: UserAccessLevel
 
 
 class FullSecurityService(AbstractSecurityService):
@@ -53,5 +61,5 @@ class FullSecurityService(AbstractSecurityService):
             user_data = self.decode_token(token)
             if not user_data:
                 raise InvalidTokenError
-            return user_data
+            return JWTUserSchema(**user_data)
 

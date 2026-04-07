@@ -31,3 +31,7 @@ class InvalidCredentialError(DomainError):
 class ForbidenError(DomainError):
     status_code = 403
     message = 'Недостаточно прав'
+
+class PasswordInvalidError(DomainError):
+    status_code = 400
+    message = 'Не правильный пароль'

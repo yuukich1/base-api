@@ -1,6 +1,6 @@
 from typing import Self
 from src.domain.models import UserBase, UserDomain
-from pydantic import EmailStr, Field, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 
 
 class UserRegisterRequest(UserBase):
@@ -25,10 +25,12 @@ class UserRegisterResponse(BaseModel):
     auth: AccessTokenResponse
 
 class UserLoginRequest(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 class UserLoginResponse(BaseModel):
     status: str
     auth: AccessTokenResponse
+    
+
     
